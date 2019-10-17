@@ -1,0 +1,12 @@
+prefix=/home/fleming/Documents/Projects/coin-or-illp-api/extern/coinor/dist
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/coin
+
+Name: OsiGlpk
+Description: COIN-OR Open Solver Interface for GLPK
+URL: https://projects.coin-or.org/Osi
+Version: trunk
+Libs: -L${libdir} -lOsiGlpk 
+Cflags: -I${includedir}
+Requires: osi coinglpk 
