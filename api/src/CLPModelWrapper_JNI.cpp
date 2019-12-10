@@ -30,7 +30,10 @@ public:
     delete model;
     // release java arrays and free memory
     for (auto clear : clearup_double) {
-      delete clear.arr;
+      // NOTE: java arrays should be released here to free up memory
+      // -- but ACCESS VIOLATION
+      // env->ReleaseDoubleArrayElements(clear.jarr, clear.arr,
+      // JNI_ABORT);
     }
   }
 };
@@ -54,6 +57,8 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
 JNIEXPORT void JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1dispose(
     JNIEnv *, jobject, jint wrappers_i) {
+  // for (auto clear : wrappers[wrappers_i]->clearup_double)
+  //   env->ReleaseDoubleArrayElements(clear.jarr, clear.arr, JNI_ABORT);
   delete wrappers[wrappers_i];
   wrappers.erase(wrappers_i);
 }
