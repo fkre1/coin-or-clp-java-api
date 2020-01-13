@@ -27,14 +27,21 @@ set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/../../src/main/")
 set(MAVEN_PATH "resources/de/unijena/bioinf/coin-or-illp-api/native")
 if(WINDOWS)
   # only the libCLPModelWrapper_JNI.dll is needed
-  # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/win" DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}")
-  install (TARGETS CLPModelWrapper_JNI DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/win")
+  # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/win"
+  #   DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/win${arch}")
+  install (TARGETS CLPModelWrapper_JNI DESTINATION
+    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/win${ARCH}")
 elseif(LINUX)
   # dependencies needed
-  install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/linux" DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}")
-  install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/linux")
+  install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/linux" DESTINATION
+    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/linux${ARCH}")
+  install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION
+    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/linux${ARCH}")
 elseif(MACOS)
   # dependencies needed
-  install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/macos" DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}")
-  install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/macos")
+  # ${ARCH} probably doesn't work
+  install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/macos"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/macos")
+  install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION
+    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/macos")
 endif()

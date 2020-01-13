@@ -16,6 +16,13 @@ elseif(CMAKE_HOST_APPLE)
 elseif(CMAKE_HOST_UNIX)
   set(LINUX 1)
 endif()
+# determine architecture
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+  set (TARGET_ARCH "64")
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86"
+    OR CMAKE_SYSTEM_PROCESSOR STREQUAL "i386")
+  set (TARGET_ARCH "32")
+endif()
 
 set(COIN_LIB_HINTS
   extern/coinor/dist/lib        # locally built libraries
