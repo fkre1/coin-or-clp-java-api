@@ -2,6 +2,10 @@
 
 ILP solver API for FragTree computation using the coin-or library
 
+## dependencies
+- `gfortran` for coin-or
+- `jdk` for Java Native Interface (JNI) libraries
+
 ## compile
 
 ``` shell
