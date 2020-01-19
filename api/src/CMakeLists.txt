@@ -10,6 +10,10 @@ endif()
 
 add_library(CLPModel STATIC CLPModel.cpp ${CLPModel_HEADER})
 add_library(CLPModelWrapper_JNI SHARED CLPModelWrapper_JNI.cpp)
+if(WINDOWS)
+  # no lib as prefix for windows DLL, so java's loadLibrary recognizes it
+  set_target_properties(CLPModelWrapper_JNI PROPERTIES PREFIX "")
+endif()
 target_include_directories(CLPModelWrapper_JNI PUBLIC ${JNI_INCLUDE_DIRS})
 target_include_directories(CLPModel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(CLPModel PUBLIC
