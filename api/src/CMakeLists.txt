@@ -28,7 +28,7 @@ target_link_libraries(CLPModelWrapper_JNI PRIVATE CLPModel ${JNI_LIBRARIES})
 
 # install for maven packaging
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/../../src/main/")
-set(MAVEN_PATH "resources/de/unijena/bioinf/coin-or-illp-api/native")
+set(MAVEN_PATH "resources/native")
 if(WINDOWS)
   # only the libCLPModelWrapper_JNI.dll is needed
   # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/win"
