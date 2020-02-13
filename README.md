@@ -30,7 +30,7 @@ Windows libraries can be compiled with MSYS2 for 32 and 64 bit on the
 same machine.
 
 Run these commands in the MSYS2 MinGW 32/64bit (depending on the
-desired target architecture):
+desired target architecture: "32" or "64" as `TARGET_ARCH`):
 
 ``` shell
 mkdir build
