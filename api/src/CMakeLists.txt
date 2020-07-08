@@ -34,18 +34,18 @@ if(WINDOWS)
   # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/win"
   #   DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/win${TARGET_ARCH}")
   install (TARGETS CLPModelWrapper_JNI DESTINATION
-    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/win${TARGET_ARCH}")
+    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/w${TARGET_ARCH}")
 elseif(LINUX)
   # dependencies needed (NOTE: copy manually!)
   # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/linux" DESTINATION
   #   "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/linux${TARGET_ARCH}")
   install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION
-    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/linux${TARGET_ARCH}")
+    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/l${TARGET_ARCH}")
 elseif(MACOS)
   # dependencies needed (NOTE: copy manually!)
   # # ${TARGET_ARCH} probably doesn't work
   # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/macos"
   #   DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/macos")
   install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION
-    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/macos")
+    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/osx")
 endif()
