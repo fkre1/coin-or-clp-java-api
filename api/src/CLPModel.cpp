@@ -3,6 +3,7 @@
 
 #include "CoinPackedMatrix.hpp"
 #include "OsiClpSolverInterface.hpp"
+#define NDEBUG
 #include <cassert>
 #include <vector>
 

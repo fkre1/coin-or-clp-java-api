@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unordered_map>
 #include <vector>
+#include <mutex>
 
 struct DoubleArrayMapping_t {
   jdoubleArray jarr;
@@ -42,6 +43,7 @@ public:
 // instance-specific information in hash map (instead of passing pointers)
 std::unordered_map<jint, CLPModelWrapper *> wrappers;
 jint wrappers_position = 0;
+std::mutex mtx;
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,8 +52,12 @@ extern "C" {
 JNIEXPORT jint JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1ctor(
     JNIEnv *, jobject, jint ncols, jint obj_sense) {
+  std::lock_guard<std::mutex> lg{mtx};
+  wrappers_position++;
   wrappers.insert({wrappers_position, new CLPModelWrapper(ncols, obj_sense)});
-  return wrappers_position++;
+  // std::cout << "added wrapper " << wrappers_position
+  //           << " -> " << wrappers[wrappers_position] << std::endl;
+  return wrappers_position;
 }
 
 JNIEXPORT void JNICALL
@@ -59,8 +65,11 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
     JNIEnv *, jobject, jint wrappers_i) {
   // for (auto clear : wrappers[wrappers_i]->clearup_double)
   //   env->ReleaseDoubleArrayElements(clear.jarr, clear.arr, JNI_ABORT);
+  mtx.lock();
   delete wrappers[wrappers_i];
   wrappers.erase(wrappers_i);
+  // std::cout << "deleted wrapper " << wrappers_i << std::endl;
+  mtx.unlock();
 }
 
 JNIEXPORT jdouble JNICALL
@@ -82,6 +91,10 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
 JNIEXPORT void JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1setTimeLimit(
     JNIEnv *, jobject, jint wrappers_i, jdouble seconds) {
+  // std::cout << "*not* setting time limit " << seconds << std::endl;
+  // std::cout << "setting time limit for wrapper " << wrappers_i;
+  // std::cout << " at address " << wrappers[wrappers_i];
+  // std::cout << " with model " << wrappers[wrappers_i]->model << std::endl;
   wrappers[wrappers_i]->model->setTimeLimit(seconds);
 }
 
@@ -136,9 +149,14 @@ JNIEXPORT void JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1addSparseRowCached(
     JNIEnv *env, jobject, jint wrappers_i, jdoubleArray j_elems,
     jintArray j_indices, jdouble lb, jdouble ub) {
+  // std::cout << "adding sparse row (cached); wrapper_index " << wrappers_i
+  //           << ", lb " << lb << ", ub " << ub << "; wrapper: ";
   CLPModelWrapper *wrapper{wrappers[wrappers_i]};
+  // std::cout << "ok, elems: ";
   double *elems{env->GetDoubleArrayElements(j_elems, nullptr)};
+  // std::cout << "ok, indices: ";
   int *indices{env->GetIntArrayElements(j_indices, nullptr)};
+  // std::cout << "ok, call successful: ";
   auto len{env->GetArrayLength(j_elems)};
   wrapper->cached_elems.reserve(wrapper->cached_elems.size() + len);
   wrapper->cached_indices.reserve(wrapper->cached_indices.size() + len);
@@ -151,6 +169,7 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
   wrapper->cached_rowstarts.push_back(wrapper->cached_rowstarts.back() + len);
   env->ReleaseDoubleArrayElements(j_elems, elems, JNI_ABORT);
   env->ReleaseIntArrayElements(j_indices, indices, JNI_ABORT);
+  // std::cout << "yes" << std::endl;
 }
 
 JNIEXPORT void JNICALL
