@@ -42,7 +42,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1ctor(
     JNIEnv *, jobject, jint ncols, jint obj_sense) {
-  return (long) new CLPModelWrapper(ncols, obj_sense);
+  return (jlong) new CLPModelWrapper(ncols, obj_sense);
 }
 
 JNIEXPORT void JNICALL
