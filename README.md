@@ -47,9 +47,25 @@ Notes:
 - `CLPModel was not found in this scope`: if compilation fails due to
   this error, all references to CLPModel.hpp have to be changed to
   CLPModel.h (for unknown reasons, the header extension has to be *.h
-  on Windows)
+  on Windows; this might also apply to OSX!)
 
 #### Linux
 
 Ensure that the dependencies are installed, then just use the commands
 listed at the top.
+
+
+#### OSX
+
+Additional dependencies like `cmake` might have to be installed (e.g.,
+via `homebrew`, see [coin-or
+README](api/extern/coinor/README.md)). Changing references from
+CLPModel.hpp to CLPModel.h might also be required (see above under "Windows").
+
+Otherwise, compile as stated at the top.
+
+As linking under OSX creates absolute paths for dependencies, these
+have to be adapted for deploying CLPModelWrapper. This can be achieved
+by copying required dependencies into the [resource
+folder](src/main/resources/native/osx/) and using the [`int`
+script](mac_utils/int).

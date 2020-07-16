@@ -1,37 +1,45 @@
-building on mac:
+# building on mac:
 some dependencies are needed:
-- bash (coinbrew)
-- wget (coinbrew)
-- gcc (includes gfortran)
+
+* bash (coinbrew)
+* wget (coinbrew)
+* gcc (includes gfortran)
 
 these can be obtained with `homebrew`:
-````bash
+
+```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 ```
 
-````bash
+```bash
 brew install bash wget gcc
 ```
 
+# download, build and install CLP
+
 to download and build CLP, first download `coinbrew`:
-````bash
+
+```bash
 wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
 chmod +x coinbrew
 ```
 
 download Clp:
-````bash
+
+```bash
 ./coinbrew fetch Clp:releases/1.17.5
 ```
 
 optionally edit the sources to remove print statements:
+
 ```bash
 emacs Clp/Clp/src/OsiClp/OsiClpSolverInterface.cpp
 # remove "std::cout" lines
 ```
 
 Then build and install
-````bash
+
+```bash
 export ADD_FFLAGS=-fallow-argument-mismatch # if using gfortran10 (from gcc10)
 ./coinbrew build install Clp:releases/1.17.5
 ```
