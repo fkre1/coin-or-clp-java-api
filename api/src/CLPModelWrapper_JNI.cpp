@@ -26,12 +26,12 @@ public:
   ~CLPModelWrapper() {
     delete model;
     // release java arrays and free memory
-    for (auto clear : clearup_double) {
-      // NOTE: java arrays should be released here to free up memory
-      // -- but ACCESS VIOLATION
-      // env->ReleaseDoubleArrayElements(clear.jarr, clear.arr,
-      // JNI_ABORT);
-    }
+    //-> leads to ACCESS VIOLATION errors, apparently Java cleans up
+    // arrays automatically
+    // for (auto clear : clearup_double) {
+    // env->ReleaseDoubleArrayElements(clear.jarr, clear.arr,
+    // JNI_ABORT);
+    // }
   }
 };
 
@@ -48,10 +48,10 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
 JNIEXPORT void JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1dispose(
   JNIEnv *, jobject, jlong wrapper_ptr) {
+  // additional (apparently not needed cleanup)
   // for (auto clear : wrappers[wrappers_i]->clearup_double)
   //   env->ReleaseDoubleArrayElements(clear.jarr, clear.arr, JNI_ABORT);
   delete (CLPModelWrapper *) wrapper_ptr;
-  // std::cout << "deleted wrapper " << wrappers_i << std::endl;
 }
 
 JNIEXPORT jdouble JNICALL
@@ -73,10 +73,6 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
 JNIEXPORT void JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1setTimeLimit(
     JNIEnv *, jobject, jlong wrapper_ptr, jdouble seconds) {
-  // std::cout << "*not* setting time limit " << seconds << std::endl;
-  // std::cout << "setting time limit for wrapper " << wrappers_i;
-  // std::cout << " at address " << ((CLPModelWrapper *) wrapper_ptr);
-  // std::cout << " with model " << ((CLPModelWrapper *) wrapper_ptr)->model << std::endl;
   ((CLPModelWrapper *) wrapper_ptr)->model->setTimeLimit(seconds);
 }
 
@@ -131,20 +127,12 @@ JNIEXPORT void JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1addSparseRowCached(
     JNIEnv *env, jobject, jlong wrapper_ptr, jdoubleArray j_elems,
     jintArray j_indices, jdouble lb, jdouble ub) {
-  // std::cout << "adding sparse row (cached); wrapper_index " << wrappers_i
-  //           << ", lb " << lb << ", ub " << ub << "; wrapper: ";
   CLPModelWrapper *wrapper{((CLPModelWrapper *) wrapper_ptr)};
-  // std::cout << "ok, elems: ";
   double *elems{env->GetDoubleArrayElements(j_elems, nullptr)};
-  // std::cout << "ok, indices: ";
   int *indices{env->GetIntArrayElements(j_indices, nullptr)};
-  // std::cout << "ok, call successful: ";
-  // std::cout << "wrapper " << wrappers_i << " add row, first index "
-  // 	    << indices[0] << "\n";
   auto len{env->GetArrayLength(j_elems)};
-  // the `reserve` calls are supposed to save time, as we now
-  // beforehand how many elements we want to add. However, for some
-  // reason, the `size()` can get negative???
+  // the `reserve` calls are supposed to save time, as we know
+  // beforehand how many elements we want to add
   wrapper->cached_elems.reserve(wrapper->cached_elems.size() + len);
   wrapper->cached_indices.reserve(wrapper->cached_indices.size() + len);
   for (int i{0}; i < len; ++i) {
@@ -156,7 +144,6 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
   wrapper->cached_rowstarts.push_back(wrapper->cached_rowstarts.back() + len);
   env->ReleaseDoubleArrayElements(j_elems, elems, JNI_ABORT);
   env->ReleaseIntArrayElements(j_indices, indices, JNI_ABORT);
-  // std::cout << "yes" << std::endl;
 }
 
 JNIEXPORT void JNICALL
@@ -189,18 +176,11 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
     auto numrows{wrapper->cached_lb.size()};
     auto len{wrapper->cached_elems.size()};
     auto maxindex{*std::max_element(wrapper->cached_indices.begin(), wrapper->cached_indices.end())};
-    // std::cout << "wrapper " << wrappers_i
-    // 	      << " indices " << &wrapper->cached_indices << " max index: "
-    // 	      << std::hex << maxindex
-    // 	      << ", len: " << len << ", numrows: " << numrows << "\n";
-    // if (maxindex > numrows)
-    //   std::cout << "!!!! ERRROR: largest index is higher than numrows !!!" << "\n";
     wrapper->model->addSparseRows(
         numrows, &wrapper->cached_rowstarts[0], &wrapper->cached_elems[0],
         &wrapper->cached_indices[0], len, &wrapper->cached_lb[0],
         &wrapper->cached_ub[0]);
   }
-  // std::cout << "solving wrapper " << wrappers_i << "\n";
   return static_cast<int>(wrapper->model->solve());
 }
 

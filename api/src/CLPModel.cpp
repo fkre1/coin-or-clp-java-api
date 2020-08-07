@@ -11,7 +11,9 @@ CLPModel::CLPModel(int ncols, ObjectiveSense obj_sense)
     : m_ncols{ncols}, m_nrows{0}, m_obj_sense{obj_sense} {
   assert(m_ncols > 0 && "The model needs to have at least one parameter");
   m_si = new OsiClpSolverInterface;
-  // NOTE: no logs, final output cannot be turned off though
+  // NOTE: no logs, final output cannot be turned off though,
+  // therefore recompilation of OsiClpSolverInterface with `std::cout`
+  // statements removed
   m_si->setLogLevel(0);
 }
 
