@@ -27,8 +27,8 @@ target_link_libraries(CLPModel PUBLIC
 target_link_libraries(CLPModelWrapper_JNI PRIVATE CLPModel ${JNI_LIBRARIES})
 
 # install for maven packaging
-set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/../../src/main/")
-set(MAVEN_PATH "resources/native")
+set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/../build/")
+set(MAVEN_PATH "native")
 if(WINDOWS)
   # only the libCLPModelWrapper_JNI.dll is needed
   # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/win"

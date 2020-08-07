@@ -1,10 +1,4 @@
 api/build
-api/extern/coinor/BuildTools
-api/extern/coinor/Clp
-api/extern/coinor/CoinUtils
-api/extern/coinor/Data
-api/extern/coinor/Osi
-api/extern/coinor/ThirdParty
 api/extern/coinor/build
 api/extern/coinor/dist/bin/
 api/extern/coinor/dist/share/
