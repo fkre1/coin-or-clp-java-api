@@ -1,0 +1,13 @@
+* text=auto !eol
+/INSTALL.Metis -text
+/coinmetis-uninstalled.pc.in -text
+/coinmetis.pc.in -text
+/config.guess -text
+/config.sub -text
+/configure -text
+/depcomp -text
+/get.Metis -text
+/install-sh -text
+/ltmain.sh -text
+/metis.patch -text
+/missing -text

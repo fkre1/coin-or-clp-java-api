@@ -27,7 +27,7 @@ chmod +x coinbrew
 download Clp:
 
 ```bash
-./coinbrew fetch Clp:releases/1.17.5
+./coinbrew fetch Clp@releases/1.17.5
 ```
 
 optionally edit the sources to remove print statements:
