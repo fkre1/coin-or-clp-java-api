@@ -8855,8 +8855,8 @@ void OsiClpSolverInterface::branchAndBound()
                       if (canDelete) {
                         nRedundantDown++;
 #if 1
-                        printf("%d redundant branch down with value %g current upper %g solution %g dj %g\n",
-                          variable, node.value_, upper[iColumn], solution[iColumn], djValue);
+                        // printf("%d redundant branch down with value %g current upper %g solution %g dj %g\n",
+                        //   variable, node.value_, upper[iColumn], solution[iColumn], djValue);
 #endif
                         node.descendants_ = 2; // ignore
                         branchingTree.sizeDeferred_++;
@@ -8916,8 +8916,8 @@ void OsiClpSolverInterface::branchAndBound()
                       if (canDelete) {
                         nRedundantUp++;
 #if 1
-                        printf("%d redundant branch up with value %g current lower %g solution %g dj %g\n",
-                          variable, node.value_, lower[iColumn], solution[iColumn], djValue);
+                        // printf("%d redundant branch up with value %g current lower %g solution %g dj %g\n",
+                        //   variable, node.value_, lower[iColumn], solution[iColumn], djValue);
 #endif
                         node.descendants_ = 2; // ignore
                         branchingTree.sizeDeferred_++;
@@ -8980,19 +8980,19 @@ void OsiClpSolverInterface::branchAndBound()
             // solve
             //resolve();
             //assert(!getIterationCount());
-            if ((numberNodes % 1000) == 0)
-              printf("%d nodes, redundant down %d (%d) up %d (%d) tree size %d best solution %g\n",
-                numberNodes, nRedundantDown, nRedundantDown2, nRedundantUp, nRedundantUp2,
-                branchingTree.size(), bestNode.objectiveValue_);
+            // if ((numberNodes % 1000) == 0)
+            //   printf("%d nodes, redundant down %d (%d) up %d (%d) tree size %d best solution %g\n",
+            //     numberNodes, nRedundantDown, nRedundantDown2, nRedundantUp, nRedundantUp2,
+            //     branchingTree.size(), bestNode.objectiveValue_);
 #else
-            if ((numberNodes % 1000) == 0)
-              printf("%d nodes, tree size %d\n",
-                numberNodes, branchingTree.size());
+            // if ((numberNodes % 1000) == 0)
+            //   printf("%d nodes, tree size %d\n",
+            //     numberNodes, branchingTree.size());
 #endif
-            if (CoinCpuTime() - time1 > 3600.0) {
-              printf("stopping after 3600 seconds\n");
-              exit(77);
-            }
+            // if (CoinCpuTime() - time1 > 3600.0) {
+            //   printf("stopping after 3600 seconds\n");
+            //   exit(77);
+            // }
             OsiNodeSimple newNode(*this, numberIntegers, which, ws);
             // something extra may have been fixed by strong branching
             // if so go round again
