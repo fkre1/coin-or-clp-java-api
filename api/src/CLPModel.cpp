@@ -1,5 +1,5 @@
 #include "CLPModel.hpp"
-#include "ClpSimplex.hpp"
+#include "CbcModel.hpp"
 
 #include "CoinPackedMatrix.hpp"
 #include "OsiClpSolverInterface.hpp"
@@ -7,13 +7,12 @@
 #include <cassert>
 #include <vector>
 
+#include <chrono>
+
 CLPModel::CLPModel(int ncols, ObjectiveSense obj_sense)
-    : m_ncols{ncols}, m_nrows{0}, m_obj_sense{obj_sense} {
+  : m_ncols{ncols}, m_nrows{0}, m_obj_sense{obj_sense} {
   assert(m_ncols > 0 && "The model needs to have at least one parameter");
   m_si = new OsiClpSolverInterface;
-  // NOTE: no logs, final output cannot be turned off though,
-  // therefore recompilation of OsiClpSolverInterface with `std::cout`
-  // statements removed
   m_si->setLogLevel(0);
 }
 
@@ -21,6 +20,7 @@ CLPModel::~CLPModel() {
   delete m_si;
   delete m_matrix;
   delete[] m_indices;
+  delete m_cbc;
 }
 
 void CLPModel::setObjective(const double objective[], int len) {
@@ -29,7 +29,7 @@ void CLPModel::setObjective(const double objective[], int len) {
 }
 
 void CLPModel::setTimeLimit(double seconds) {
-  m_si->getModelPtr()->setMaximumSeconds(seconds);
+  m_max_seconds = seconds;
 }
 
 void CLPModel::setColBounds(const double col_lb[], const double col_ub[],
@@ -74,6 +74,7 @@ void CLPModel::addSparseRows(int numrows, const int rowstarts[],
   m_row_lb_cached = lb;
   m_row_ub_cached = ub;
   m_nrows += numrows;
+  // m_matrix->dumpMatrix();
 }
 
 CLPModel::ReturnStatus CLPModel::solve() {
@@ -87,15 +88,17 @@ CLPModel::ReturnStatus CLPModel::solve() {
   // set col start
   if (m_col_start)
     m_si->setColSolution(m_col_start);
-  m_si->branchAndBound();
-  if (m_si->isProvenOptimal())
+  m_cbc = new CbcModel(*m_si);
+  m_cbc->setLogLevel(0);
+  m_cbc->setMaximumSeconds(m_max_seconds);
+  m_cbc->branchAndBound();
+  if (m_cbc->isProvenOptimal())
     return CLPModel::RET_OPTIMAL;
-  if (m_si->isProvenPrimalInfeasible() || m_si->isProvenDualInfeasible())
+  if (m_cbc->isProvenInfeasible())
     return CLPModel::RET_INFEASIBLE;
-  if (m_si->isAbandoned())
-    return CLPModel::RET_ABANDONED;
-  if (m_si->isPrimalObjectiveLimitReached() ||
-      m_si->isDualObjectiveLimitReached() || m_si->isIterationLimitReached())
+  if (m_cbc->isSecondsLimitReached())
     return CLPModel::RET_LIMIT_REACHED;
+  if (m_cbc->isAbandoned())
+    return CLPModel::RET_ABANDONED;
   return CLPModel::RET_UNKNOWN;
 }

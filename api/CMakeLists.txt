@@ -3,7 +3,7 @@ project(CLPapi)
 # cmake flags/requirements
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # for IDEs
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # for compiling shared lib
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.18)
 set(CMAKE_CXX_FLAGS "-fpermissive") # DEBUG, remove later
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -75,6 +75,8 @@ find_library(CLP_COINMETIS NAMES coinmetis
 find_library(CLP_COINLAPACK NAMES coinlapack
   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
 find_library(CLP_COINASL NAMES coinasl
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+find_library(CLP_CBC NAMES Cbc
   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
 find_library(GFORTRAN NAMES gfortran libgfortran-5.dll)
 if (WINDOWS)

@@ -175,7 +175,6 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
     // assume everything is cached
     auto numrows{wrapper->cached_lb.size()};
     auto len{wrapper->cached_elems.size()};
-    auto maxindex{*std::max_element(wrapper->cached_indices.begin(), wrapper->cached_indices.end())};
     wrapper->model->addSparseRows(
         numrows, &wrapper->cached_rowstarts[0], &wrapper->cached_elems[0],
         &wrapper->cached_indices[0], len, &wrapper->cached_lb[0],

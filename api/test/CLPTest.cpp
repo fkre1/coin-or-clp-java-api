@@ -2,6 +2,7 @@
 #include "CLPModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "catch.hpp"
+#include "CbcModel.hpp"
 
 #include <vector>
 
@@ -27,6 +28,12 @@ TEST_CASE("Feasible ILP") {
   REQUIRE(model.solve() == CLPModel::RET_OPTIMAL);
   REQUIRE(model.getScore() == Approx(28.0));
   const double *col_solution = model.getColSolution();
+  std::cout << "col solution: ";
+  for (int i = 0; i < model.getNCols(); ++i) {
+    std::cout << col_solution[i] << " ";
+  }
+  std::cout << "\n";
+
   REQUIRE(col_solution[0] == Approx(0.0));
   REQUIRE(col_solution[1] == Approx(4.0));
   delete[] objective;
@@ -57,7 +64,9 @@ TEST_CASE("Sirius standard experiment MPS") {
   si->setObjSense(-1);
   for (int i{0}; i < si->getNumCols(); ++i)
     si->setInteger(i);
-  si->branchAndBound();
-  REQUIRE(si->isProvenOptimal());
-  REQUIRE(si->getObjValue() == Approx(27.208));
+  CbcModel model2(*si);
+  model2.branchAndBound();
+  // si->branchAndBound();
+  REQUIRE(model2.isProvenOptimal());
+  REQUIRE(model2.getObjValue() == Approx(27.208));
 }

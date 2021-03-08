@@ -23,7 +23,10 @@ target_link_libraries(CLPModel PUBLIC
   ${CLP_COINGLPK} ${CLP_COINLAPACK} ${CLP_COINMUMPS}
   ${CLP_COINBLAS} ${CLP_COINMETIS}
   # system libraries, needed by windows
-  ${GFORTRAN} ${BZ2} ${ZLIB_LIBRARIES} ${GMP})
+  ${GFORTRAN} ${BZ2} ${ZLIB_LIBRARIES} ${GMP}
+  # CBC
+  ${CLP_CBC}
+  )
 
 target_link_libraries(CLPModelWrapper_JNI PRIVATE CLPModel ${JNI_LIBRARIES})
 
@@ -52,10 +55,11 @@ install(CODE [[
   file(GET_RUNTIME_DEPENDENCIES
     RESOLVED_DEPENDENCIES_VAR RESOLVED
     UNRESOLVED_DEPENDENCIES_VAR UNRESOLVED
+    CONFLICTING_DEPENDENCIES_PREFIX CONF
     LIBRARIES $<TARGET_FILE:CLPModelWrapper_JNI>)
   foreach (found_dep IN LISTS RESOLVED)
     # copy only these libs
-    if (found_dep MATCHES ".*(Clp|coin|gcc_s|gfortran|quadmath|stdc\\+\\+).*"
+    if (found_dep MATCHES ".*([Cc]bc|[Cc]lp|[Cc]oin|gcc_s|gfortran|quadmath|stdc\\+\\+).*"
 	OR (MACOS AND found_dep MATCHES ".*gmp.*"))
       # TODO: WINDOWS
       # copy all depencencies only as major version

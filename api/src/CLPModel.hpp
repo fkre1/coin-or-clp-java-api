@@ -1,9 +1,8 @@
 #ifndef CLPMODEL_H
 #define CLPMODEL_H
-#include "ClpSimplex.hpp"
 #include "CoinPackedMatrix.hpp"
-#include "CoinPackedVector.hpp"
 #include "OsiClpSolverInterface.hpp"
+#include "CbcModel.hpp"
 #include <vector>
 class CLPModel {
 public:
@@ -18,6 +17,7 @@ public:
 
 private:
   OsiClpSolverInterface *m_si;
+  CbcModel* m_cbc;
   CoinPackedMatrix *m_matrix{nullptr};
   const int m_ncols;
   int m_nrows;
@@ -31,6 +31,7 @@ private:
   const double *m_col_start{nullptr};
   ObjectiveSense m_obj_sense;
   int *m_indices{nullptr};
+  double m_max_seconds{1.0e100};
 
 public:
   CLPModel(int ncols, ObjectiveSense obj_sense = OBJ_MAXIMIZE);
@@ -50,8 +51,8 @@ public:
                      const int indices[], int len, const double lb[],
                      const double ub[]);
   ReturnStatus solve();
-  const double *getColSolution() const { return m_si->getColSolution(); }
-  double getScore() const { return m_si->getObjValue(); }
+  const double *getColSolution() const { return m_cbc->getColSolution(); }
+  double getScore() const { return m_cbc->getObjValue(); }
 };
 
 #endif /* CLPMODEL_H */
