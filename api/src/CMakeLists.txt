@@ -24,28 +24,60 @@ target_link_libraries(CLPModel PUBLIC
   ${CLP_COINBLAS} ${CLP_COINMETIS}
   # system libraries, needed by windows
   ${GFORTRAN} ${BZ2} ${ZLIB_LIBRARIES} ${GMP})
+
 target_link_libraries(CLPModelWrapper_JNI PRIVATE CLPModel ${JNI_LIBRARIES})
 
-# install for maven packaging
+# install path corresponding to os/arch
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/../build/")
 set(MAVEN_PATH "native")
 if(WINDOWS)
-  # only the libCLPModelWrapper_JNI.dll is needed
-  # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/win"
-  #   DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/win${TARGET_ARCH}")
-  install (TARGETS CLPModelWrapper_JNI DESTINATION
-    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/w${TARGET_ARCH}")
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/w${TARGET_ARCH}")
 elseif(LINUX)
-  # dependencies needed (NOTE: copy manually!)
-  # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/linux" DESTINATION
-  #   "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/linux${TARGET_ARCH}")
-  install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION
-    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/l${TARGET_ARCH}")
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/l${TARGET_ARCH}")
 elseif(MACOS)
-  # dependencies needed (NOTE: copy manually!)
-  # # ${TARGET_ARCH} probably doesn't work
-  # install (DIRECTORY "${PROJECT_SOURCE_DIR}/../platforms/macos"
-  #   DESTINATION "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/macos")
-  install (TARGETS CLPModel CLPModelWrapper_JNI DESTINATION
-    "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/osx")
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}${MAVEN_PATH}/osx")
 endif()
+
+
+set_target_properties(CLPModelWrapper_JNI PROPERTIES INSTALL_RPATH ".:$ORIGIN")
+# install wrapper lib
+install (TARGETS CLPModelWrapper_JNI DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+# install dependencies
+# INSTALL_PATH has to be set manually; otherwise not available at install time
+install(CODE "set(INSTALL_PATH \"${CMAKE_INSTALL_PREFIX}\")")
+install(CODE "set(MACOS \"${MACOS}\")")
+install(CODE "set(WINDOWS \"${WINDOWS}\")")
+install(CODE [[
+  file(GET_RUNTIME_DEPENDENCIES
+    RESOLVED_DEPENDENCIES_VAR RESOLVED
+    UNRESOLVED_DEPENDENCIES_VAR UNRESOLVED
+    LIBRARIES $<TARGET_FILE:CLPModelWrapper_JNI>)
+  foreach (found_dep IN LISTS RESOLVED)
+    # copy only these libs
+    if (found_dep MATCHES ".*(Clp|coin|gcc_s|gfortran|quadmath|stdc\\+\\+).*"
+	OR (MACOS AND found_dep MATCHES ".*gmp.*"))
+      # TODO: WINDOWS
+      # copy all depencencies only as major version
+      if (IS_SYMLINK "${found_dep}")
+	file(READ_SYMLINK ${found_dep} found_dep_res)
+	if(NOT IS_ABSOLUTE "${found_dep_res}")
+	  get_filename_component(dir ${found_dep} DIRECTORY)
+	  set(found_dep_res "${dir}/${found_dep_res}")
+	endif()
+	file(INSTALL ${found_dep_res} DESTINATION ${INSTALL_PATH})
+	get_filename_component(found_dep ${found_dep} NAME)
+	get_filename_component(found_dep_res ${found_dep_res} NAME)
+	file(RENAME "${INSTALL_PATH}/${found_dep_res}" "${INSTALL_PATH}/${found_dep}")
+	message("renaming ${found_dep_res} to ${found_dep}")
+      else()
+	file(INSTALL ${found_dep} DESTINATION ${INSTALL_PATH})
+	get_filename_component(found_dep ${found_dep} NAME)
+      endif()
+      # adapt rpath
+      # TODO: MACOS: install_name_tool
+      execute_process(COMMAND patchelf --set-rpath ".:$ORIGIN" ${found_dep}
+	WORKING_DIRECTORY ${INSTALL_PATH})
+    endif()
+  endforeach()
+  ]])
