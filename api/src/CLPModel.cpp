@@ -7,8 +7,6 @@
 #include <cassert>
 #include <vector>
 
-#include <chrono>
-
 CLPModel::CLPModel(int ncols, ObjectiveSense obj_sense)
   : m_ncols{ncols}, m_nrows{0}, m_obj_sense{obj_sense} {
   assert(m_ncols > 0 && "The model needs to have at least one parameter");

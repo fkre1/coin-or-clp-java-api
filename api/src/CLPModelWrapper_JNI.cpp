@@ -9,9 +9,6 @@ struct DoubleArrayMapping_t {
 class CLPModelWrapper {
 public:
   CLPModel *model;
-  // tuples of java arrays/C++ arrays that have to be released at the end
-  std::vector<DoubleArrayMapping_t> clearup_double;
-
   // for row caching
   std::vector<double> cached_elems;
   std::vector<int> cached_indices;
@@ -25,13 +22,6 @@ public:
   }
   ~CLPModelWrapper() {
     delete model;
-    // release java arrays and free memory
-    //-> leads to ACCESS VIOLATION errors, apparently Java cleans up
-    // arrays automatically
-    // for (auto clear : clearup_double) {
-    // env->ReleaseDoubleArrayElements(clear.jarr, clear.arr,
-    // JNI_ABORT);
-    // }
   }
 };
 
@@ -48,9 +38,6 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
 JNIEXPORT void JNICALL
 Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPModel_1JNI_n_1dispose(
   JNIEnv *, jobject, jlong wrapper_ptr) {
-  // additional (apparently not needed cleanup)
-  // for (auto clear : wrappers[wrappers_i]->clearup_double)
-  //   env->ReleaseDoubleArrayElements(clear.jarr, clear.arr, JNI_ABORT);
   delete (CLPModelWrapper *) wrapper_ptr;
 }
 
@@ -66,7 +53,6 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
   auto len{env->GetArrayLength(j_objective)};
   CLPModelWrapper *wrapper{((CLPModelWrapper *) wrapper_ptr)};
   double *objective = env->GetDoubleArrayElements(j_objective, nullptr);
-  wrapper->clearup_double.push_back({j_objective, objective});
   wrapper->model->setObjective(objective, len);
 }
 
@@ -84,8 +70,6 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
   double *col_lb = env->GetDoubleArrayElements(j_col_lb, nullptr);
   double *col_ub = env->GetDoubleArrayElements(j_col_ub, nullptr);
   auto len{env->GetArrayLength(j_col_lb)};
-  wrapper->clearup_double.push_back({j_col_lb, col_lb});
-  wrapper->clearup_double.push_back({j_col_ub, col_ub});
   wrapper->model->setColBounds(col_lb, col_ub, len);
 }
 
@@ -95,7 +79,6 @@ Java_de_unijena_bioinf_FragmentationTreeConstruction_computation_tree_ilp_CLPMod
   CLPModelWrapper *wrapper{((CLPModelWrapper *) wrapper_ptr)};
   double *start = env->GetDoubleArrayElements(j_start, nullptr);
   auto len{env->GetArrayLength(j_start)};
-  wrapper->clearup_double.push_back({j_start, start});
   wrapper->model->setColStart(start, len);
 }
 

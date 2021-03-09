@@ -48,6 +48,7 @@ install (TARGETS CLPModelWrapper_JNI DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 # install dependencies
 # INSTALL_PATH has to be set manually; otherwise not available at install time
+cmake_policy(SET CMP0087 NEW)	# allows generator expressions in install commands
 install(CODE "set(INSTALL_PATH \"${CMAKE_INSTALL_PREFIX}\")")
 install(CODE "set(MACOS \"${MACOS}\")")
 install(CODE "set(WINDOWS \"${WINDOWS}\")")
