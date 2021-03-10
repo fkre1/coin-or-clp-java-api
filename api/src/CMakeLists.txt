@@ -17,15 +17,13 @@ endif()
 target_include_directories(CLPModelWrapper_JNI PUBLIC ${JNI_INCLUDE_DIRS})
 target_include_directories(CLPModel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(CLPModel PUBLIC
-  # definitely needed CLP libraries
+  ${CLP_CBC} ${CLP_CGL}
   ${CLP_CLP} ${CLP_OSICLP} ${CLP_OSI} ${CLP_COINUTILS}
   # auxiliary libraries, needed by windows
-  ${CLP_COINGLPK} ${CLP_COINLAPACK} ${CLP_COINMUMPS}
+  ${CLP_COINLAPACK} ${CLP_COINMUMPS}
   ${CLP_COINBLAS} ${CLP_COINMETIS}
   # system libraries, needed by windows
   ${GFORTRAN} ${BZ2} ${ZLIB_LIBRARIES} ${GMP}
-  # CBC
-  ${CLP_CBC}
   )
 
 target_link_libraries(CLPModelWrapper_JNI PRIVATE CLPModel ${JNI_LIBRARIES})
@@ -62,7 +60,7 @@ install(CODE [[
     # copy only these libs
     if (found_dep MATCHES ".*([Cc]bc|[Cc]lp|[Cc]oin|gcc_s|gfortran|quadmath|stdc\\+\\+).*"
 	OR (MACOS AND found_dep MATCHES ".*gmp.*"))
-      # TODO: WINDOWS
+      # TODO: WINDOWS: copy manually for now
       # copy all depencencies only as major version
       if (IS_SYMLINK "${found_dep}")
 	file(READ_SYMLINK ${found_dep} found_dep_res)
@@ -80,9 +78,12 @@ install(CODE [[
 	get_filename_component(found_dep ${found_dep} NAME)
       endif()
       # adapt rpath
-      # TODO: MACOS: install_name_tool
-      execute_process(COMMAND patchelf --set-rpath ".:$ORIGIN" ${found_dep}
-	WORKING_DIRECTORY ${INSTALL_PATH})
+      # TODO: MACOS: install_name_tool; for now use macutils/int in native/osx folder
+      # Windows: not needed
+      if (NOT MACOS AND NOT WINDOWS)
+	execute_process(COMMAND patchelf --set-rpath ".:$ORIGIN" ${found_dep}
+	  WORKING_DIRECTORY ${INSTALL_PATH})
+      endif()
     endif()
   endforeach()
   ]])

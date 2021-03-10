@@ -29,8 +29,8 @@ if (CMAKE_HOST_WIN32)
   endif()
 elseif(CMAKE_HOST_APPLE)
   set(MACOS 1)
-  set(COIN_LIB_HINTS extern/coinor/macos/dist/lib)
-  include_directories(extern/coinor/macos/dist/include/coin)
+  set(COIN_LIB_HINTS extern/coinor/osx/dist/lib)
+  include_directories(extern/coinor/osx/dist/include/coin)
 elseif(CMAKE_HOST_UNIX)
   set(LINUX 1)
   if (TARGET_ARCH STREQUAL "32")
@@ -47,14 +47,6 @@ include_directories(extern/coinor/dist/include/coin)
 message("Arch: ${TARGET_ARCH}, using compiled CLP binaries from "
   "${COIN_LIB_HINTS}")
 
-# set(COIN_LIB_HINTS
-#   # extern/coinor/dist/lib        # locally built libraries
-#   # extern/coinor/win32/dist/lib
-#   # extern/coinor/win64/dist/lib
-#   # extern/coinor/macos/dist/lib
-#   extern/coinor/linux64/dist/lib
-#   )
-
 # coin files
 find_library(CLP_COINUTILS NAMES CoinUtils libCoinUtils.lib
   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
@@ -64,28 +56,33 @@ find_library(CLP_OSICLP NAMES OsiClp libOsiClp.lib
   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
 find_library(CLP_CLP NAMES Clp libClp.lib
   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-find_library(CLP_COINGLPK NAMES coinglpk
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-find_library(CLP_COINMUMPS NAMES coinmumps
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-find_library(CLP_COINBLAS NAMES coinblas
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-find_library(CLP_COINMETIS NAMES coinmetis
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-find_library(CLP_COINLAPACK NAMES coinlapack
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-find_library(CLP_COINASL NAMES coinasl
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
 find_library(CLP_CBC NAMES Cbc
   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-find_library(GFORTRAN NAMES gfortran libgfortran-5.dll)
 if (WINDOWS)
+  find_library(CLP_COINGLPK NAMES coinglpk
+    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  find_library(CLP_COINMUMPS NAMES coinmumps
+    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  find_library(CLP_COINBLAS NAMES coinblas
+    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  find_library(CLP_COINMETIS NAMES coinmetis
+    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  find_library(CLP_COINLAPACK NAMES coinlapack
+    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  find_library(CLP_COINASL NAMES coinasl
+    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
   find_library(BZ2 NAMES bz2 libbz2-1.dll)
   find_library(ZSTD NAMES zstd libzstd.dll)
   find_library(GMP NAMES gmp)
+  # NOTE: new versions of the gcc toolchain + cmake seem to not be able to find the
+  # gfortran DLL with `find_library` (`CMAKE_FIND_LIBRARY_SUFFIXES` here do not include
+  # '.dll' but only '.dll.a') -- hence find_file is used with an absolute path hint which
+  # might have to be adapted
+  # find_library(GFORTRAN NAMES gfortran libgfortran-5.dll)
+  find_file(GFORTRAN NAMES libgfortran-5.dll PATHS "C:/msys64/mingw64/bin")
 endif()
 
-message("COIN libraries: ${CLP_CLP} ${CLP_OSICLP} ${CLP_OSI} ${CLP_COINUTILS}")
+message("COIN libraries: ${CLP_CLP} ${CLP_OSICLP} ${CLP_OSI} ${CLP_COINUTILS} ${CLP_CBC}")
 
 add_subdirectory(extern/catch)
 add_subdirectory(src)

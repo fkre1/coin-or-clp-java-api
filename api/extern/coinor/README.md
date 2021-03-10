@@ -17,16 +17,18 @@ brew install bash wget gcc
 
 # download, build and install CLP
 
-to download and build CLP, first download `coinbrew`:
+to download and build CLP, first download `coinbrew`, if not already present:
 
 ```bash
 wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
 chmod +x coinbrew
 ```
 
-Then build and install CLP and CBC
+See <https://coin-or.github.io/coinbrew/> for additional requirements and install if necessary (i.e., coinbrew fails).
+
+Then build and install CBC (prefix e.g., `(win64|linux64|osx)/dist`)
 
 ```bash
 export ADD_FFLAGS=-fallow-argument-mismatch # if using gfortran10 (from gcc10)
-./coinbrew build install Cbc@2.10.5 Clp@1.17.5 --parallel-jobs $(nproc) --tests none --prefix $os$arch/dist
+./coinbrew build install Cbc@2.10.5 --parallel-jobs $(nproc) --tests none --prefix $os$arch/dist
 ```
