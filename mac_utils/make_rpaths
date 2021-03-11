@@ -1,0 +1,19 @@
+#!/bin/bash
+
+for lib in *.dylib
+do
+#lib=$1
+    echo "=== lib $lib ==="
+    libbn=$(basename $lib)
+    install_name_tool -id @rpath/$libbn $lib
+    install_name_tool -add_rpath "@loader_path" $lib
+    echo "$lib id: $(otool -D $lib), rpath(s): $(otool -l $lib | grep RPATH -A2)"
+    for dep in $(otool -L $lib | grep -v "@rpath")
+    do
+	bn=$(basename $dep)
+	if [ -f $bn ]; then
+	    echo $dep "->" $bn
+	    install_name_tool -change $dep @rpath/$bn $lib	    
+	fi
+    done
+done
