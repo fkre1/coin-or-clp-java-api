@@ -16,17 +16,25 @@ if(WINDOWS)
 endif()
 target_include_directories(CLPModelWrapper_JNI PUBLIC ${JNI_INCLUDE_DIRS})
 target_include_directories(CLPModel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if (STATIC_STD)
+  set(EXTRA_STATIC_LINKS "-static-libgcc -static-libstdc++")
+  message("STATIC_STD set: ${EXTRA_STATIC_LINKS}")
+endif()
 target_link_libraries(CLPModel PUBLIC
+  ${EXTRA_STATIC_LINKS}
   ${CLP_CBC} ${CLP_CGL}
   ${CLP_CLP} ${CLP_OSICLP} ${CLP_OSI} ${CLP_COINUTILS}
-  # auxiliary libraries, needed by windows
   ${CLP_COINLAPACK} ${CLP_COINMUMPS}
   ${CLP_COINBLAS} ${CLP_COINMETIS}
-  # system libraries, needed by windows
-  ${GFORTRAN} ${BZ2} ${ZLIB_LIBRARIES} ${GMP}
+  # system libraries, NOTE: might have to be uncommented for windows
+  # ${GFORTRAN} ${BZ2} ${ZLIB_LIBRARIES} ${GMP}
   )
 
-target_link_libraries(CLPModelWrapper_JNI PRIVATE CLPModel ${JNI_LIBRARIES})
+target_link_libraries(CLPModelWrapper_JNI PRIVATE CLPModel
+  # NOTE: JNI_LIBRARIES should be commmented out for linux (old libc). If getting errors
+  # on other build systems, reenable
+  # ${JNI_LIBRARIES}
+  )
 
 # install path corresponding to os/arch
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/../build/")
@@ -58,7 +66,7 @@ install(CODE [[
     LIBRARIES $<TARGET_FILE:CLPModelWrapper_JNI>)
   foreach (found_dep IN LISTS RESOLVED)
     # copy only these libs
-    if (found_dep MATCHES ".*([Cc]bc|[Cc]lp|[Cc]oin|gcc_s|gfortran|quadmath|stdc\\+\\+).*"
+    if (found_dep MATCHES ".*([Cc]bc|[Cc]lp|[Cc]oin|gcc_s|gfortran|quadmath|c\\+\\+).*"
 	OR (MACOS AND found_dep MATCHES ".*gmp.*"))
       # TODO: WINDOWS: copy manually for now
       # copy all depencencies only as major version
