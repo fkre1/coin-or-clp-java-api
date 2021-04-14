@@ -74,6 +74,13 @@ if (WINDOWS)
   find_library(BZ2 NAMES bz2 libbz2-1.dll)
   find_library(ZSTD NAMES zstd libzstd.dll)
   find_library(GMP NAMES gmp)
+  find_library(CLP_CLPSOLVER NAMES ClpSolver
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+find_library(CLP_CBCSOLVER NAMES CbcSolver
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  find_library(CLP_CGL NAMES Cgl
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+
   # NOTE: new versions of the gcc toolchain + cmake seem to not be able to find the
   # gfortran DLL with `find_library` (`CMAKE_FIND_LIBRARY_SUFFIXES` here do not include
   # '.dll' but only '.dll.a') -- hence find_file is used with an absolute path hint which

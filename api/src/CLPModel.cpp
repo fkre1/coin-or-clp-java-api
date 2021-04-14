@@ -1,4 +1,4 @@
-#include "CLPModel.hpp"
+#include "CLPModel.h"
 #include "CbcModel.hpp"
 
 #include "CoinPackedMatrix.hpp"

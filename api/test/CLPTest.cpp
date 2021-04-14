@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_MAIN
-#include "CLPModel.hpp"
+#include "CLPModel.h"
 #include "OsiClpSolverInterface.hpp"
 #include "catch.hpp"
 #include "CbcModel.hpp"

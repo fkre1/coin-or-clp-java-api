@@ -1,4 +1,4 @@
-#include "CLPModel.hpp"
+#include "CLPModel.h"
 #include <jni.h>
 
 struct DoubleArrayMapping_t {
