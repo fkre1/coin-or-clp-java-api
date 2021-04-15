@@ -1,0 +1,68 @@
+name: build_CLP_win64
+
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2016
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: winfix
+
+      - name: setup msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            base-devel
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            git
+            zip
+
+      - name: Cache coin-or dependencies
+        id: cache-coinor
+        uses: actions/cache@v2
+        with:
+          path:  api/extern/coinor/win64/dist
+          key: ${{ runner.os }}-coinor
+
+      - name: build coinor
+        shell: msys2 {0}
+        working-directory: api/extern/coinor
+        if: steps.cache-coinor.outputs.cache-hit != 'true'
+        run: |
+          export ADD_FFLAGS=-fallow-argument-mismatch
+          ./coinbrew build install Cbc@2.10 --parallel-jobs $(nproc) --tests none --prefix win64/dist
+
+      - name: build CLPWrapper
+        shell: msys2 {0}
+        working-directory: api
+        run: |
+          mkdir build
+          cd build
+          cmake -G "MSYS Makefiles" -DTARGET_ARCH=64 ..
+          cmake --build . --target install
+
+      - name: CLPTest
+        working-directory: api/build/test
+        shell: msys2 {0}
+        run: ./CLPTest
+
+      - name: copy dependencies
+        working-directory: api/build/native/w64
+        shell: msys2 {0}
+        run: |
+          ldd CLPModelWrapper_JNI.dll
+          cp -v /mingw64/bin/libgfortran-5.dll /mingw64/bin/libgcc_s_seh-1.dll /mingw64/bin/libbz2-1.dll /mingw64/bin/libstdc++-6.dll /mingw64/bin/libgmp-10.dll /mingw64/bin/zlib1.dll /mingw64/bin/libquadmath-0.dll /mingw64/bin/libwinpthread-1.dll .
+
+      - name: upload
+        working-directory: api/build/native/w64
+        shell: msys2 {0}
+        run: |
+          zip clp_w64.zip *.dll
+          curl --user '${{ secrets.CLOUD_USER }}:${{ secrets.CLOUD_PW }}' -T clp_w64.zip ${{ secrets.CLOUD_ADDRESS }}/clp_w64.zip

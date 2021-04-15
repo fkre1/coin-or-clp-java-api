@@ -1,0 +1,45 @@
+name: build_CLP_linux64
+
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cache coin-or dependencies
+        id: cache-coinor
+        uses: actions/cache@v2
+        with:
+          path:  api/extern/coinor/linux64/dist
+          key: ${{ runner.os }}-coinor
+
+      - name: build coinor
+        working-directory: api/extern/coinor
+        if: steps.cache-coinor.outputs.cache-hit != 'true'
+        run: |
+          export ADD_FFLAGS=-fallow-argument-mismatch
+          # export ADD_CXXFLAGS=-lrt # only use if getting the error: "undefined reference to `clock_gettime'"
+          ./coinbrew build install Cbc@2.10 --parallel-jobs $(nproc) --tests none --prefix linux64/dist
+
+      - name: build CLPWrapper
+        working-directory: api
+        run: |
+          mkdir build
+          cd build
+          cmake .. # with -DSTATIC_STD=ON for old glibc versions
+          cmake --build . --target install
+
+      - name: CLPTest
+        working-directory: api/build/test
+        run: ./CLPTest
+
+      - name: upload
+        working-directory: api/build/native/l64
+        run: |
+          zip clp_l64.zip *
+          curl --user '${{ secrets.CLOUD_USER }}:${{ secrets.CLOUD_PW }}' -T clp_l64.zip ${{ secrets.CLOUD_ADDRESS }}/clp_l64.zip
