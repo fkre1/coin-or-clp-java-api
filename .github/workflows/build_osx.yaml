@@ -19,7 +19,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path:  api/extern/coinor/osx/dist
-          key: ${{ runner.os }}-coinor
+          key: ${{ runner.os }}-coinor-cbc2.10.8
 
       - name: build coinor
         working-directory: api/extern/coinor
@@ -28,7 +28,7 @@ jobs:
         run: |
           export ADD_FFLAGS=-fallow-argument-mismatch
           export ADD_CXXFLAGS=-lrt # only use if getting the error: "undefined reference to `clock_gettime'"
-          ./coinbrew build install Cbc@2.10 --parallel-jobs 4 --verbosity 3 --tests none --prefix osx/dist
+          ./coinbrew build install Cbc@releases/2.10.8 --parallel-jobs 4 --verbosity 3 --tests none --prefix osx/dist
 
       - name: build CLPWrapper
         working-directory: api

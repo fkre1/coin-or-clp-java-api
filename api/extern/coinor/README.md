@@ -31,5 +31,5 @@ Then build and install CBC (prefix e.g., `(win64|linux64|osx)/dist`)
 ```bash
 export ADD_FFLAGS=-fallow-argument-mismatch # only use for gfortran10 (from gcc10), when getting errors
 export ADD_CXXFLAGS=-lrt # only use if getting the error: "undefined reference to `clock_gettime'"
-./coinbrew build install Cbc@2.10 --parallel-jobs $(nproc) --tests none --prefix $prefix
+./coinbrew build install Cbc@releases/2.10.8 --parallel-jobs $(nproc) --tests none --prefix $prefix
 ```
