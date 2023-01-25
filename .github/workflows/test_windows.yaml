@@ -1,0 +1,50 @@
+name: test_sirius
+
+
+on:    
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+          os: [windows-latest, windows-2016, windows-2019]
+    steps:
+
+      # download sirius + demo data
+      - name: download and unzip sirius + demo data
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -OutFile sirius-4.7.4-win64-headless.zip https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.7.4/sirius-4.7.4-win64-headless.zip
+          Invoke-WebRequest -OutFile demo.zip https://bio.informatik.uni-jena.de/wp/wp-content/uploads/2015/05/demo.zip
+          Expand-Archive -LiteralPath sirius-4.7.4-win64-headless.zip
+          Expand-Archive -LiteralPath demo.zip
+
+      - name: test sirius with demo-data (1)
+        working-directory: ./sirius-4.7.4-win64-headless/sirius
+        shell: pwsh
+        run: |
+          Get-FileHash CLPModelWrapper_JNI.dll
+          ./sirius.bat -i ../../demo/demo-data/ms sirius
+        
+      - name: get new CLP DLL(s)
+        shell: pwsh
+        run: |
+          $user = "${{ secrets.CLOUD_USER }}"
+          $pass = "${{ secrets.CLOUD_PW }}"
+          $secpasswd = ConvertTo-SecureString $pass -AsPlainText -Force
+          $credential = New-Object System.Management.Automation.PSCredential($user, $secpasswd)
+          Invoke-WebRequest -Credential $credential -OutFile clp_w64.zip ${{ secrets.CLOUD_ADDRESS }}/clp_w64.zip
+          Expand-Archive -LiteralPath clp_w64.zip
+          ls
+          cp clp_w64/* sirius-4.7.4-win64-headless/sirius
+          
+      - name: test sirius with demo-data (2)
+        working-directory: ./sirius-4.7.4-win64-headless/sirius
+        shell: pwsh
+        run: |
+          Get-FileHash CLPModelWrapper_JNI.dll
+          ./sirius.bat -i ../../demo/demo-data/ms sirius
+          
+          
