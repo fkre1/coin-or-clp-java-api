@@ -61,7 +61,7 @@ jobs:
           url=https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/clp/
           if [[ $(curl -Is $url/$zipfile | head -n 1 | grep -c 'OK') -eq 1 ]]; then
             curl $url/$zipfile -o $zipfile
-            zip $zipfile -d 'clp/osx/*' # delete old binaries
+            zip $zipfile -d 'clp/osx/*' || true # delete old binaries
           fi
           mkdir clp
           cp -r osx clp/
