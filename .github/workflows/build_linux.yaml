@@ -48,6 +48,6 @@ jobs:
             zip $zipfile -d 'clp/l64/*' # delete old binaries
           fi
           mkdir clp
-          cp l64 clp/
+          cp -r l64 clp/
           zip $zipfile clp/l64/* # insert new ones
           curl --user '${{ secrets.ARTIFACTORY_USERNAME }}:${{ secrets.ARTIFACTORY_TOKEN }}' -X PUT $url -T $zipfile
