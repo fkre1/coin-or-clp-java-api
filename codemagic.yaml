@@ -35,5 +35,7 @@ workflows:
       - name: adapt runpaths
         script: |
           chmod +x mac_utils/make_rpaths
+          chmod +x mac_utils/mac_ldd
           cd api/build/native/osx
           ../../../../mac_utils/make_rpaths
+          ../../../../mac_utils/mac_ldd libCLPModelWrapper_JNI.dylib
