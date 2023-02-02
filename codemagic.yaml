@@ -1,14 +1,14 @@
 workflows:
   build-m1:
     scripts:
-      - name: get coinor binaries
-        script: |
-          pwd
-          cd api/extern/coinor
-          mkdir -p osx/dist
-          cd osx/dist
-          wget https://anaconda.org/conda-forge/coincbc/2.10.5/download/osx-arm64/coincbc-2.10.5-hca96968_1.tar.bz2
-          tar -xf *.tar.bz2
+      # - name: get coinor binaries
+      #   script: |
+      #     pwd
+      #     cd api/extern/coinor
+      #     mkdir -p osx/dist
+      #     cd osx/dist
+      #     wget https://anaconda.org/conda-forge/coincbc/2.10.5/download/osx-arm64/coincbc-2.10.5-hca96968_1.tar.bz2
+      #     tar -xf *.tar.bz2
 
       - name: conda coinor
         script: |
