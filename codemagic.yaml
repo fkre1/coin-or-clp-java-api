@@ -10,6 +10,13 @@ workflows:
           wget https://anaconda.org/conda-forge/coincbc/2.10.5/download/osx-arm64/coincbc-2.10.5-hca96968_1.tar.bz2
           tar -xf *.tar.bz2
 
+      - name: conda coinor
+        script: |
+          brew install miniconda
+          conda init
+          zsh
+          conda install coincbc
+
       - name: build wrapper
         script: |
           pwd

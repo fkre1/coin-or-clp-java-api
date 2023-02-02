@@ -43,6 +43,9 @@ elseif(CMAKE_HOST_UNIX)
 endif()
 set(COIN_LIB_HINTS_GENERAL extern/coinor/dist/lib) # locally built libraries
 include_directories(extern/coinor/dist/include/coin)
+set(HINTS_GENERAL $ENV{HOME}/miniconda3/lib)
+include_directories($ENV{HOME}/miniconda3/include)
+include_directories($ENV{HOME}/miniconda3/include/coin)
 
 message("Arch: ${TARGET_ARCH}, using compiled CLP binaries preferably from "
   "${COIN_LIB_HINTS}")
