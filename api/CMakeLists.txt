@@ -43,24 +43,24 @@ elseif(CMAKE_HOST_UNIX)
 endif()
 set(COIN_LIB_HINTS_GENERAL extern/coinor/dist/lib) # locally built libraries
 include_directories(extern/coinor/dist/include/coin)
-set(HINTS_GENERAL $ENV{HOME}/miniconda3/lib)
-include_directories($ENV{HOME}/miniconda3/include)
-include_directories($ENV{HOME}/miniconda3/include/coin)
+set(HINTS_GENERAL /opt/homebrew/Caskroom/miniconda/base/lib)
+include_directories(/opt/homebrew/Caskroom/miniconda/base/include/coin)
+include_directories(/opt/homebrew/Caskroom/miniconda/base/include/)
 
 message("Arch: ${TARGET_ARCH}, using compiled CLP binaries preferably from "
   "${COIN_LIB_HINTS}")
 
 # coin files
 find_library(CLP_COINUTILS NAMES CoinUtils libCoinUtils.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} ${HINTS_GENERAL})
 find_library(CLP_OSI NAMES Osi libOsi.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} ${HINTS_GENERAL})
 find_library(CLP_OSICLP NAMES OsiClp libOsiClp.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} ${HINTS_GENERAL})
 find_library(CLP_CLP NAMES Clp libClp.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} ${HINTS_GENERAL})
 find_library(CLP_CBC NAMES Cbc
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} ${HINTS_GENERAL})
 if (WINDOWS)
   # find_library(CLP_COINGLPK NAMES coinglpk
   #   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})

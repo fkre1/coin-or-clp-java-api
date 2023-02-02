@@ -15,7 +15,7 @@ workflows:
           brew install miniconda
           conda init
           zsh
-          conda install coincbc
+          conda install coincbc -c conda-forge
 
       - name: build wrapper
         script: |
