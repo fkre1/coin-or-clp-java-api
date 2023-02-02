@@ -23,4 +23,4 @@ workflows:
         script: |
           pwd
           cd api/build/test
-          run: ./CLPTest
+          ./CLPTest
