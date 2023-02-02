@@ -24,3 +24,9 @@ workflows:
           pwd
           cd api/build/test
           ./CLPTest
+
+      - name: adapt runpaths
+        script: |
+          chmod +x mac_utils/make_rpaths
+          cd api/build/native/osx
+          ../../../../mac_utils/make_rpaths
