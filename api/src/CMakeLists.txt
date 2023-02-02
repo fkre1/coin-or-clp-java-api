@@ -1,11 +1,11 @@
 project(CLPWrapper CXX)
 
 find_package(JNI REQUIRED)
-set(CLPModel_HEADER "CLPModel.hpp")
+set(CLPModel_HEADER "CLPModel.h")
 if (WINDOWS)
   find_package(ZLIB REQUIRED)
   # if .hpp on windows: "not defined in this scope" errors
-  set(CLPModel_HEADER "CLPModel.h")
+  #set(CLPModel_HEADER "CLPModel.h")
 endif()
 
 add_library(CLPModel STATIC CLPModel.cpp ${CLPModel_HEADER})
