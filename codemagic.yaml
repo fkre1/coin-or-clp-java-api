@@ -2,4 +2,7 @@ workflows:
   my-workflow:
     scripts:
       - name: say hello
-        script: echo "Hello Codemagician!"
+        script: |
+          sw_vers
+          uname -a
+          echo "Hello Codemagician!"
