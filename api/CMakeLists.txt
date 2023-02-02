@@ -44,33 +44,33 @@ endif()
 set(COIN_LIB_HINTS_GENERAL extern/coinor/dist/lib) # locally built libraries
 include_directories(extern/coinor/dist/include/coin)
 
-message("Arch: ${TARGET_ARCH}, using compiled CLP binaries from "
+message("Arch: ${TARGET_ARCH}, using compiled CLP binaries preferably from "
   "${COIN_LIB_HINTS}")
 
 # coin files
 find_library(CLP_COINUTILS NAMES CoinUtils libCoinUtils.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
 find_library(CLP_OSI NAMES Osi libOsi.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
 find_library(CLP_OSICLP NAMES OsiClp libOsiClp.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
 find_library(CLP_CLP NAMES Clp libClp.lib
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
 find_library(CLP_CBC NAMES Cbc
-  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
 if (WINDOWS)
-  find_library(CLP_COINGLPK NAMES coinglpk
-    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-  find_library(CLP_COINMUMPS NAMES coinmumps
-    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-  find_library(CLP_COINBLAS NAMES coinblas
-    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-  find_library(CLP_COINMETIS NAMES coinmetis
-    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-  find_library(CLP_COINLAPACK NAMES coinlapack
-    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
-  find_library(CLP_COINASL NAMES coinasl
-    PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL} NO_DEFAULT_PATH)
+  # find_library(CLP_COINGLPK NAMES coinglpk
+  #   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  # find_library(CLP_COINMUMPS NAMES coinmumps
+  #   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  # find_library(CLP_COINBLAS NAMES coinblas
+  #   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  # find_library(CLP_COINMETIS NAMES coinmetis
+  #   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  # find_library(CLP_COINLAPACK NAMES coinlapack
+  #   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
+  # find_library(CLP_COINASL NAMES coinasl
+  #   PATHS ${COIN_LIB_HINTS} ${COIN_LIB_HINTS_GENERAL})
   find_library(BZ2 NAMES bz2 libbz2-1.dll)
   find_library(ZSTD NAMES zstd libzstd.dll)
   find_library(GMP NAMES gmp)

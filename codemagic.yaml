@@ -1,8 +1,26 @@
 workflows:
-  my-workflow:
+  build-m1:
     scripts:
-      - name: say hello
+      - name: get coinor binaries
         script: |
-          sw_vers
-          uname -a
-          echo "Hello Codemagician!"
+          pwd
+          cd api/extern/coinor
+          mkdir -p osx/dist
+          cd osx/dist
+          wget https://anaconda.org/conda-forge/coincbc/2.10.5/download/osx-arm64/coincbc-2.10.5-hca96968_1.tar.bz2
+          tar -xf *.tar.bz2
+
+      - name: build wrapper
+        script: |
+          pwd
+          cd api
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --target install
+
+      - name: CLPTest
+        script: |
+          pwd
+          cd api/build/test
+          run: ./CLPTest
