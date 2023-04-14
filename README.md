@@ -1,4 +1,4 @@
-# coin-or-illp-api
+# coin-or-clp-java-api
 
 ILP solver API for FragTree computation using the coin-or library
 
