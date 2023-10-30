@@ -1,11 +1,11 @@
 project(CLPWrapper CXX)
 
 find_package(JNI REQUIRED)
-set(CLPModel_HEADER "CLPModel.hpp")
+set(CLPModel_HEADER "CLPModel.h")
 if (WINDOWS)
   find_package(ZLIB REQUIRED)
   # if .hpp on windows: "not defined in this scope" errors
-  set(CLPModel_HEADER "CLPModel.h")
+  #set(CLPModel_HEADER "CLPModel.h")
 endif()
 
 add_library(CLPModel STATIC CLPModel.cpp ${CLPModel_HEADER})
@@ -64,7 +64,7 @@ install(CODE [[
     LIBRARIES $<TARGET_FILE:CLPModelWrapper_JNI>)
   foreach (found_dep IN LISTS RESOLVED)
     # copy only these libs
-    if (found_dep MATCHES ".*([Cc]bc|[Cc]lp|[Cc]oin|gcc_s|gfortran|quadmath|c\\+\\+).*"
+    if (found_dep MATCHES ".*([Cc]bc|[Cc]lp|[Cc]oin|gcc_s|gfortran|lapack|quadmath|c\\+\\+).*"
 	OR (MACOS AND found_dep MATCHES ".*gmp.*"))
       # TODO: WINDOWS: copy manually for now
       # copy all depencencies only as major version

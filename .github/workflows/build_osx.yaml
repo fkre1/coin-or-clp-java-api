@@ -6,10 +6,10 @@ on:
 
 jobs:
   build:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
-      - name: get new bash version
-        run: brew install bash
+      - name: get coin-or osx dependencies
+        run: brew install bash gcc@10 wget svn git
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,16 +23,20 @@ jobs:
 
       - name: build coinor
         working-directory: api/extern/coinor
-        shell: bash
         if: steps.cache-coinor.outputs.cache-hit != 'true'
         run: |
-          export ADD_FFLAGS=-fallow-argument-mismatch
-          export ADD_CXXFLAGS=-lrt # only use if getting the error: "undefined reference to `clock_gettime'"
-          ./coinbrew build install Cbc@releases/2.10.8 --parallel-jobs 4 --verbosity 3 --tests none --prefix osx/dist
+          ./coinbrew build install Cbc@releases/2.10.8 --parallel-jobs 4 --verbosity 3 --tests none --prefix osx/dist || ./coinbrew build install Cbc@releases/2.10.8 --parallel-jobs 4 --verbosity 3 --tests none --prefix osx/dist
+
+      - name: hpp/h fix
+        shell: bash
+        run: |
+          for f in api/src/CLPModelWrapper_JNI.cpp api/src/CMakeLists.txt api/src/CLPModel.cpp api/test/CLPTest.cpp; do
+            sed -i'.bak' 's/CLPModel.hpp/CLPModel.h/ g' $f
+          done
+          mv api/src/CLPModel.hpp api/src/CLPModel.h
 
       - name: build CLPWrapper
         working-directory: api
-        shell: bash
         run: |
           mkdir build
           cd build
@@ -45,12 +49,21 @@ jobs:
 
       - name: adapt runpaths
         working-directory: api/build/native/osx
-        shell: bash
-        run: ../../../../mac_utils/make_rpaths
+        run: |
+          chmod +x ../../../../mac_utils/make_rpaths
+          ../../../../mac_utils/make_rpaths
 
       - name: upload
-        working-directory: api/build/native/osx
+        working-directory: api/build/native
         shell: bash
         run: |
-          zip clp_osx.zip *
-          curl --user '${{ secrets.CLOUD_USER }}:${{ secrets.CLOUD_PW }}' -T clp_osx.zip ${{ secrets.CLOUD_ADDRESS }}/clp_osx.zip
+          zipfile=clp_cbc-2.10.8.zip
+          url=https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/clp/
+          if [[ $(curl -Is $url/$zipfile | head -n 1 | grep -c 'OK') -eq 1 ]]; then
+            curl $url/$zipfile -o $zipfile
+            zip $zipfile -d 'clp/osx/*' || true # delete old binaries
+          fi
+          mkdir clp
+          cp -r osx clp/
+          zip $zipfile clp/osx/* # insert new ones
+          curl --user '${{ secrets.ARTIFACTORY_USERNAME }}:${{ secrets.ARTIFACTORY_TOKEN }}' -X PUT $url -T $zipfile

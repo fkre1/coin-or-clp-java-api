@@ -1,0 +1,41 @@
+workflows:
+  build-m1:
+    scripts:
+      # - name: get coinor binaries
+      #   script: |
+      #     pwd
+      #     cd api/extern/coinor
+      #     mkdir -p osx/dist
+      #     cd osx/dist
+      #     wget https://anaconda.org/conda-forge/coincbc/2.10.5/download/osx-arm64/coincbc-2.10.5-hca96968_1.tar.bz2
+      #     tar -xf *.tar.bz2
+
+      - name: conda coinor
+        script: |
+          brew install miniconda
+          conda init
+          zsh
+          conda install coincbc -c conda-forge
+
+      - name: build wrapper
+        script: |
+          pwd
+          cd api
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --target install
+
+      - name: CLPTest
+        script: |
+          pwd
+          cd api/build/test
+          ./CLPTest
+
+      - name: adapt runpaths
+        script: |
+          chmod +x mac_utils/make_rpaths
+          chmod +x mac_utils/mac_ldd
+          cd api/build/native/osx
+          ../../../../mac_utils/make_rpaths
+          ../../../../mac_utils/mac_ldd libCLPModelWrapper_JNI.dylib

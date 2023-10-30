@@ -3,10 +3,15 @@ name: build_CLP_win64
 
 on:
   workflow_dispatch:
+    inputs:
+      upload:
+        description: 'upload to artifactory'
+        type: boolean
+        default: false
 
 jobs:
   build:
-    runs-on: windows-2016
+    runs-on: windows-2019
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -61,8 +66,17 @@ jobs:
           cp -v /mingw64/bin/libgfortran-5.dll /mingw64/bin/libgcc_s_seh-1.dll /mingw64/bin/libbz2-1.dll /mingw64/bin/libstdc++-6.dll /mingw64/bin/libgmp-10.dll /mingw64/bin/zlib1.dll /mingw64/bin/libquadmath-0.dll /mingw64/bin/libwinpthread-1.dll .
 
       - name: upload
-        working-directory: api/build/native/w64
+        working-directory: api/build/native/
+        if: ${{ inputs.upload }}
         shell: msys2 {0}
         run: |
-          zip clp_w64.zip *.dll
-          curl --user '${{ secrets.CLOUD_USER }}:${{ secrets.CLOUD_PW }}' -T clp_w64.zip ${{ secrets.CLOUD_ADDRESS }}/clp_w64.zip
+          zipfile=clp_cbc-2.10.8.zip
+          url=https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/clp/
+          if [[ $(curl -Is $url/$zipfile | head -n 1 | grep -c 'OK') -eq 1 ]]; then
+            curl $url/$zipfile -o $zipfile
+            zip $zipfile -d 'clp/w64/*' || true # delete old binaries
+          fi
+          mkdir clp
+          cp -r w64 clp/
+          zip $zipfile clp/w64/* # insert new ones
+          curl --user '${{ secrets.ARTIFACTORY_USERNAME }}:${{ secrets.ARTIFACTORY_TOKEN }}' -X PUT $url -T $zipfile
