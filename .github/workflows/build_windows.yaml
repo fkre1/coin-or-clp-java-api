@@ -3,6 +3,11 @@ name: build_CLP_win64
 
 on:
   workflow_dispatch:
+    inputs:
+      upload:
+        description: 'upload to artifactory'
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -62,6 +67,7 @@ jobs:
 
       - name: upload
         working-directory: api/build/native/
+        if: ${{ inputs.upload }}
         shell: msys2 {0}
         run: |
           zipfile=clp_cbc-2.10.8.zip
